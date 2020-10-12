@@ -4,6 +4,10 @@
 minibsdiff
 *.exe
 *.swp
+*.dll
+*.dyn_o
+*.a
+*.so
 
 build*/
 /result

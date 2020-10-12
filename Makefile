@@ -1,6 +1,8 @@
 # -- Configuration -------------------------------------------------------------
 
 CC?=cc
+AR?=ar
+RANLIB?=ranlib
 OPTIMIZATION?=-O3 -march=native -fomit-frame-pointer -funroll-loops
 
 STD  = -std=c99 -pedantic
@@ -58,9 +60,9 @@ QUIET_CRYPTOL_GENTEST = @printf '    %b %b\n' $(LINKCOLOR)CRYPTOL[G]$(ENDCOLOR) 
 endif
 
 QCC=$(QUIET_CC) $(CC)
-QAR=$(QUIET_AR) ar
+QAR=$(QUIET_AR) $(AR)
 QLINK=$(QUIET_LINK) $(CC)
-QRANLIB=$(QUIET_RANLIB) ranlib
+QRANLIB=$(QUIET_RANLIB) $(RANLIB)
 QINSTALL=$(QUIET_INSTALL) $(INSTALL)
 
 E=@echo
@@ -82,7 +84,18 @@ tarball:
 	$(Q)git archive --prefix=$(RELNAME)/ -o $(RELNAME).tar.xz HEAD
 
 clean:
-	$(Q)rm -f *.xz *.a *.so *.o *.dyn_o *~ minibsdiff
+	$(Q)rm -f *.xz *.a *.so *.o *.dyn_o *.exe *.dll *~ minibsdiff
+
+# -- Windows build rules -------------------------------------------------------
+
+windows: minibsdiff.exe minibsdiff.dll
+
+minibsdiff.exe: minibsdiff.c
+	$(QCC) $(MY_CFLAGS) -o $@ $<
+
+minibsdiff.dll: bsdiff.o bspatch.o
+	$(QAR) -rc $@ $^
+	$(QRANLIB) $@
 
 # -- Build rules ---------------------------------------------------------------
 
